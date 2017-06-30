@@ -7,29 +7,60 @@ set -e
 
 curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
 
-echo "Updates packages. Asks for your password."
+echo "Add Package repositories"
+
+echo "Adding java"
+sudo add-apt-repository ppa:webupd8team/java
+
+echo "Adding numix"
+sudo apt-add-repository ppa:numix/ppa
+
+echo "Adding skype"
+echo "deb [arch=amd64] https://repo.skype.com/deb stable main" | sudo tee /etc/apt/sources.list.d/skype-stable.list
+curl https://repo.skype.com/data/SKYPE-GPG-KEY | sudo apt-key add -
+
+echo "Adding uget"
+sudo add-apt-repository ppa:plushuang-tw/uget-stable
+
+echo "Adding google-cloud-sdk"
+export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)"
+echo "deb https://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+
+echo "Adding spotify"
+sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys BBEBDCB318AD50EC6865090613B00F1FD2C19886\
+echo deb http://repository.spotify.com stable non-free | sudo tee /etc/apt/sources.list.d/spotify.list\
+
+echo "Adding rvm"
+gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3
+curl -sSL https://get.rvm.io | bash -s stable
+
+echo "Updates packages"
 sudo apt update -y
 sudo apt dist-upgrade
 
 echo "Installs packages. Give your password when asked."
-sudo apt --ignore-missing install build-essential tcl git-core curl openssl libssl-dev libcurl4-openssl-dev zlib1g zlib1g-dev libreadline-dev libreadline6 libreadline6-dev libyaml-dev libsqlite3-dev libsqlite3-0 sqlite3 libxml2-dev libxslt1-dev python-software-properties libffi-dev libgdm-dev libncurses5-dev automake autoconf libtool bison postgresql postgresql-contrib libpq-dev pgadmin3 libc6-dev nodejs libgdbm-dev vim gitk synapse apt-transport-https ca-certificates docker-ce chromium libappindicator1 vlc terminator gparted gnome-shell-extensions python-pip npm nodejs-legacy graphviz ubuntu-restricted-extras software-properties-common gvim vim-gnome mongodb-clients meld gnome-mplayer kdiff3 libqt4-dev openvpn -y
+sudo apt --ignore-missing install build-essential tcl git-core curl openssl libssl-dev libcurl4-openssl-dev zlib1g zlib1g-dev libreadline-dev libreadline6 libreadline6-dev libyaml-dev libsqlite3-dev libsqlite3-0 sqlite3 libxml2-dev libxslt1-dev python-software-properties libffi-dev libgdm-dev libncurses5-dev automake autoconf libtool bison postgresql postgresql-contrib libpq-dev pgadmin3 libc6-dev nodejs libgdbm-dev vim gitk synapse apt-transport-https ca-certificates docker-ce chromium libappindicator1 vlc terminator gparted gnome-shell-extensions python-pip npm nodejs-legacy graphviz ubuntu-restricted-extras software-properties-common gvim vim-gnome mongodb-clients meld gnome-mplayer kdiff3 libqt4-dev openvpn oracle-java8-installer oracle-java8-set-default numix-icon-theme-circle numix-gtk-theme docker.io uget zsh google-cloud-sdk spotify-client skypeforlinux -y
+
 sudo apt -f install
 
-sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys BBEBDCB318AD50EC6865090613B00F1FD2C19886\
-echo deb http://repository.spotify.com stable non-free | sudo tee /etc/apt/sources.list.d/spotify.list\
-sudo apt-get update
-sudo apt-get install spotify-client
+# sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys BBEBDCB318AD50EC6865090613B00F1FD2C19886\
+# echo deb http://repository.spotify.com stable non-free | sudo tee /etc/apt/sources.list.d/spotify.list\
 
-sudo add-apt-repository ppa:webupd8team/java
-sudo apt update; sudo apt install oracle-java8-installer
-javac -version
-sudo apt install oracle-java8-set-default
+# sudo apt-get update
+# sudo apt-get install spotify-client
 
-sudo apt-add-repository ppa:numix/ppa
-sudo apt-get update
-sudo apt install numix-icon-theme-circle
-sudo apt install numix-gtk-theme 
+# sudo add-apt-repository ppa:webupd8team/java
+# sudo apt update; sudo apt install oracle-java8-installer
+# javac -version
+# sudo apt install oracle-java8-set-default
 
+# sudo apt-add-repository ppa:numix/ppa
+# sudo apt-get update
+# sudo apt install numix-icon-theme-circle
+# sudo apt install numix-gtk-theme 
+
+echo "Install Pip Modules -> youtube_dl, coursera-dl, edx-dl"
 sudo pip install --upgrade pip
 sudo pip install --upgrade youtube_dl
 sudo -H pip install -U edx-dl
@@ -57,8 +88,8 @@ echo "Installs ImageMagick for image processing"
 sudo apt install imagemagick --fix-missing -y
 
 echo "Installs RVM (Ruby Version Manager) for handling Ruby installation"
-gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3
-curl -sSL https://get.rvm.io | bash -s stable
+# gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3
+# curl -sSL https://get.rvm.io | bash -s stable
 source ~/.rvm/scripts/rvm
 
 echo "Installs Ruby"
@@ -94,7 +125,7 @@ git clone git@bitbucket.org:dev_grabonrent/kubernetes-config.git
 
 echo "docker setup"
 sudo apt remove docker docker-engine
-sudo apt install docker-ce
+# sudo apt install docker.io
 sudo service docker start
 sudo groupadd docker
 sudo usermod -aG docker $USER
@@ -117,22 +148,29 @@ nvm install 0.11.13
 nvm install 7.4.0
 nvm use 7.4.0
 
-echo "install skype"
-sudo dpkg --add-architecture i386
-sudo dpkg -i skype-ubuntu-precise_4.3.0.37-1_i386.deb 
-sudo apt -f install 
+# echo "install skype"
+# sudo dpkg -s apt-transport-https > /dev/null || bash -c "sudo apt-get update; sudo apt-get install apt-transport-https -y" 
+# curl https://repo.skype.com/data/SKYPE-GPG-KEY | sudo apt-key add -
+# echo "deb [arch=amd64] https://repo.skype.com/deb stable main" | sudo tee /etc/apt/sources.list.d/skype-stable.list
+# sudo dpkg --add-architecture i386
+# sudo dpkg -i skype-ubuntu-precise_4.3.0.37-1_i386.deb
+# sudo apt-get install skypeforlinux -y  
+# sudo apt -f install 
 
-echo "install uget"
-sudo add-apt-repository ppa:plushuang-tw/uget-stable
-sudo apt update
-sudo apt install uget
+# echo "install uget"
+# sudo add-apt-repository ppa:plushuang-tw/uget-stable
+# sudo apt update
+# sudo apt install uget
 
 echo "install steam"
 sudo dpkg -i steam_latest.deb 
 
 echo "install zsh"
-sudo apt install zsh
+# sudo apt install zsh
 chsh -s /bin/zsh
+
+echo "install prezto"
+git clone --recursive https://github.com/sorin-ionescu/prezto.git "${ZDOTDIR:-$HOME}/.zprezto"
 
 curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl\
 chmod +x ./kubectl\
@@ -149,10 +187,10 @@ sudo -H pip install powerline-status
 git clone https://github.com/powerline/fonts.git
 sh install.sh
 
-export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)"
-echo "deb https://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
-curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
-sudo apt update && sudo apt install google-cloud-sdk
+# export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)"
+# echo "deb https://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+# curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+# sudo apt update && sudo apt install google-cloud-sdk
 gcloud init
 gcloud components
 gcloud components install kubectl
